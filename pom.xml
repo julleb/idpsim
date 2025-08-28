@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>21</java.version>
+		<opensaml.version>4.1.1</opensaml.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -51,6 +52,42 @@
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
+
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml-core</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml-saml-api</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml-saml-impl</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml-messaging-api</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml-messaging-impl</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml-soap-api</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml-soap-impl</artifactId>
+			<version>${opensaml.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
