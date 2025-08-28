@@ -22,6 +22,7 @@ import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
+import se.idpsim.Idpsimulator.utils.ObjectUtils;
 
 @Getter
 public class SamlResponse {
@@ -38,6 +39,15 @@ public class SamlResponse {
     @Builder
     public SamlResponse(String issuer, String destination, String inResponseTo,
         List<SamlAssertion> assertions, String nameId, String audience) {
+
+        ObjectUtils.requireNonEmpty(issuer, "issuer cannot be empty");
+        ObjectUtils.requireNonEmpty(destination, "destination cannot be empty");
+        ObjectUtils.requireNonEmpty(inResponseTo, "inResponseTo cannot be empty");
+        ObjectUtils.requireNonEmpty(assertions, "assertions cannot be empty");
+        ObjectUtils.requireNonEmpty(nameId, "nameId cannot be empty");
+        ObjectUtils.requireNonEmpty(audience, "audience cannot be empty");
+
+
         this.issuer = issuer;
         this.destination = destination;
         this.inResponseTo = inResponseTo;
