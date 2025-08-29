@@ -15,14 +15,27 @@ import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 import org.opensaml.security.credential.UsageType;
 import se.idpsim.Idpsimulator.utils.ObjectUtils;
 
-@Getter
+
 public class SamlMetadata {
 
+    @Getter
     private String singleSignOnServiceUrl;
+
+    @Getter
     private String entityId;
+
+    @Getter
     private String singleLogoutService;
+
+    @Getter
     private X509Certificate signingCertificate;
+
+
     private EntityDescriptor entityDescriptor;
+
+    EntityDescriptor getEntityDescriptor() {
+        return entityDescriptor;
+    }
 
     @Builder
     public SamlMetadata(String singleSignOnServiceUrl, String entityId, String singleLogoutService,

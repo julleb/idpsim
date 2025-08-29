@@ -23,17 +23,33 @@ import org.opensaml.saml.saml2.core.SubjectConfirmationData;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import se.idpsim.Idpsimulator.utils.ObjectUtils;
 
-@Getter
+
 public class SamlResponse {
 
+    @Getter
     private String issuer; //the IdP issuer
+
+    @Getter
     private String destination; //the service providers ACS URL
+
+    @Getter
     private String inResponseTo; //the ID of the SamlRequest
+
+    @Getter
     private List<SamlAssertion> assertions;
+
+    @Getter
     private String nameId; //The NameID to use in the response
+
     private Response response;
     private Instant createdAt;
+
+    @Getter
     private String audience; //The issuer of the SamlRequest
+
+    Response getResponse() {
+        return response;
+    }
 
     @Builder
     public SamlResponse(String issuer, String destination, String inResponseTo,
