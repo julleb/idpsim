@@ -16,9 +16,9 @@ import se.idpsim.Idpsimulator.utils.KeystoreUtils;
 @Service
 public class SamlSigningService {
 
-    private static final String keyStorePath = "classpath: saml/saml-keys.jks";
-    private static final String keyStoreAlias = "signing-key";
-    private static final String passwordToAlias = "lol";
+    static final String keyStorePath = "classpath: saml/saml-keys.jks";
+    static final String keyStoreAlias = "signing-key";
+    static final String passwordToAlias = "lol";
 
     private final X509Certificate signingCertificate;
     private final PrivateKey signingPrivateKey;

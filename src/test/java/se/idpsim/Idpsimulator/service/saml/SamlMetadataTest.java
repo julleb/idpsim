@@ -1,10 +1,11 @@
 package se.idpsim.Idpsimulator.service.saml;
 
-import javax.xml.transform.TransformerException;
+import java.security.KeyStore;
+import java.security.cert.X509Certificate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.opensaml.core.xml.io.MarshallingException;
 import org.w3c.dom.Document;
+import se.idpsim.Idpsimulator.utils.KeystoreUtils;
 
 class SamlMetadataTest {
 
@@ -14,10 +15,14 @@ class SamlMetadataTest {
     }
 
     @Test
-    void test() throws TransformerException, MarshallingException {
+    void createSamlMetadata_shouldBeOk() throws Exception {
+        KeyStore ks = KeystoreUtils.getKeyStore(SamlSigningService.keyStorePath, "");
+        X509Certificate cert = KeystoreUtils.getAsX509Certificate(ks, SamlSigningService.keyStoreAlias);
+
         SamlMetadata metadata = SamlMetadata.builder().singleSignOnServiceUrl("abc")
             .entityId("yo")
             .singleLogoutService("no")
+            .signingCertificate(cert)
             .build();
 
         Document doc = SamlUtils.toDocument(metadata.getEntityDescriptor());

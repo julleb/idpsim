@@ -1,6 +1,8 @@
 package se.idpsim.Idpsimulator.service.saml;
 
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import lombok.Builder;
 import lombok.Getter;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
@@ -13,6 +15,8 @@ import org.opensaml.saml.saml2.metadata.KeyDescriptor;
 import org.opensaml.saml.saml2.metadata.NameIDFormat;
 import org.opensaml.saml.saml2.metadata.SingleSignOnService;
 import org.opensaml.security.credential.UsageType;
+import org.opensaml.xmlsec.signature.KeyInfo;
+import org.opensaml.xmlsec.signature.X509Data;
 import se.idpsim.Idpsimulator.utils.ObjectUtils;
 
 
@@ -45,16 +49,22 @@ public class SamlMetadata {
             "singleSignOnServiceUrl cannot be empty");
         ObjectUtils.requireNonEmpty(entityId, "entityId cannot be empty");
         ObjectUtils.requireNonEmpty(singleLogoutService, "singleLogoutService cannot be empty");
+        ObjectUtils.requireNonNull(signingCertificate, "signingCertificate cannot be null");
 
         this.singleSignOnServiceUrl = singleSignOnServiceUrl;
         this.entityId = entityId;
         this.singleLogoutService = singleLogoutService;
         this.signingCertificate = signingCertificate;
 
-        entityDescriptor = createSamlMetadata();
+        try {
+            entityDescriptor = createSamlMetadata();
+        } catch(CertificateEncodingException e) {
+            //TODO fix better exception
+            throw new RuntimeException(e);
+        }
     }
 
-    private EntityDescriptor createSamlMetadata() {
+    private EntityDescriptor createSamlMetadata() throws CertificateEncodingException {
         XMLObjectBuilderFactory builderFactory =
             XMLObjectProviderRegistrySupport.getBuilderFactory();
 
@@ -89,13 +99,24 @@ public class SamlMetadata {
         idpDescriptor.getNameIDFormats()
             .add(nameIdFormat);
 
+        //set keydescriptor
         KeyDescriptor keyDescriptor =
             (KeyDescriptor) builderFactory.getBuilder(KeyDescriptor.DEFAULT_ELEMENT_NAME)
                 .buildObject(KeyDescriptor.DEFAULT_ELEMENT_NAME);
-
         keyDescriptor.setUse(UsageType.SIGNING);
-        // Add X509Certificate
-        // ... create KeyInfo, X509Data, X509Certificate ...
+        KeyInfo keyInfo = (KeyInfo) builderFactory.getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME)
+            .buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
+        X509Data x509Data = (X509Data) builderFactory.getBuilder(X509Data.DEFAULT_ELEMENT_NAME)
+            .buildObject(X509Data.DEFAULT_ELEMENT_NAME);
+        org.opensaml.xmlsec.signature.X509Certificate x509CertElement = (org.opensaml.xmlsec.signature.X509Certificate) builderFactory
+            .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME)
+            .buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
+
+        String encodedCert = Base64.getEncoder().encodeToString(signingCertificate.getEncoded());
+        x509CertElement.setValue(encodedCert);
+        x509Data.getX509Certificates().add(x509CertElement);
+        keyInfo.getX509Datas().add(x509Data);
+        keyDescriptor.setKeyInfo(keyInfo);
 
         idpDescriptor.getKeyDescriptors()
             .add(keyDescriptor);
