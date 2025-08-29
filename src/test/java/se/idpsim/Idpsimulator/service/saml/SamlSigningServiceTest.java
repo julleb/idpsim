@@ -6,14 +6,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.io.MarshallingException;
 
-class SamlServiceTest {
+class SamlSigningServiceTest {
 
-    private SamlService samlService;
+    private SamlSigningService samlSigningService;
 
 
     @BeforeEach
     void setup() throws Exception {
-        samlService = new SamlService();
+        samlSigningService = new SamlSigningService();
     }
 
     @Test
@@ -30,7 +30,7 @@ class SamlServiceTest {
                 .build()))
             .build();
 
-        samlService.signSamlResponse(samlResponse);
+        samlSigningService.signSamlResponse(samlResponse);
 
         String samlResponseString = SamlUtils.samlResponseToString(samlResponse);
         System.out.println(samlResponseString);

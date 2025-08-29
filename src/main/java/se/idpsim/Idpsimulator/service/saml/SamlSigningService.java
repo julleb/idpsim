@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import se.idpsim.Idpsimulator.utils.KeystoreUtils;
 
 @Service
-public class SamlService {
+public class SamlSigningService {
 
     private static final String keyStorePath = "classpath: saml/saml-keys.jks";
     private static final String keyStoreAlias = "signing-key";
@@ -23,13 +23,12 @@ public class SamlService {
     private final X509Certificate signingCertificate;
     private final PrivateKey signingPrivateKey;
 
-    SamlService() throws Exception {
+    SamlSigningService() throws Exception {
         String keystorePassword = "";
         var keyStore = KeystoreUtils.getKeyStore(keyStorePath, keystorePassword);
         signingCertificate = KeystoreUtils.getAsX509Certificate(keyStore, keyStoreAlias);
         signingPrivateKey = KeystoreUtils.getPrivateKey(keyStore, keyStoreAlias, passwordToAlias);
     }
-
 
 
     public void signSamlResponse(SamlResponse samlResponse) {
