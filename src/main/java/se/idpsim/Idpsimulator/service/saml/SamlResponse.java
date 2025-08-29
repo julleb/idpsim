@@ -2,7 +2,6 @@ package se.idpsim.Idpsimulator.service.saml;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
@@ -54,7 +53,6 @@ public class SamlResponse {
         this.assertions = assertions;
         this.nameId = nameId;
         this.audience = audience;
-
         createdAt = Instant.now();
         buildSamlResponse();
     }
@@ -82,8 +80,7 @@ public class SamlResponse {
             .buildObject(Response.DEFAULT_ELEMENT_NAME);
         response.setIssuer(issuer);
         response.setInResponseTo(this.inResponseTo);
-        response.setID(UUID.randomUUID()
-            .toString());
+        response.setID(SamlUtils.generateSecureRandomId());
         response.setDestination(destination);
         response.setStatus(status);
         response.getAssertions()
@@ -137,7 +134,7 @@ public class SamlResponse {
     private Assertion createAssertion(XMLObjectBuilderFactory builderFactory) {
         Assertion assertion = (Assertion) builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME)
             .buildObject(Assertion.DEFAULT_ELEMENT_NAME);
-        assertion.setID("_" + UUID.randomUUID());
+        assertion.setID("_" + SamlUtils.generateSecureRandomId());
         assertion.setIssueInstant(createdAt);
         return assertion;
     }
