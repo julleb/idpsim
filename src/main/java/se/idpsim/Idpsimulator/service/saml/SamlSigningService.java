@@ -2,6 +2,7 @@ package se.idpsim.Idpsimulator.service.saml;
 
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import lombok.Getter;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.security.SecurityException;
 import org.opensaml.security.x509.BasicX509Credential;
@@ -20,6 +21,7 @@ public class SamlSigningService {
     static final String keyStoreAlias = "signing-key";
     static final String passwordToAlias = "lol";
 
+    @Getter
     private final X509Certificate signingCertificate;
     private final PrivateKey signingPrivateKey;
 
@@ -29,7 +31,6 @@ public class SamlSigningService {
         signingCertificate = KeystoreUtils.getAsX509Certificate(keyStore, keyStoreAlias);
         signingPrivateKey = KeystoreUtils.getPrivateKey(keyStore, keyStoreAlias, passwordToAlias);
     }
-
 
     public void signSamlResponse(SamlResponse samlResponse) {
         BasicX509Credential signingCredential = new BasicX509Credential(signingCertificate, signingPrivateKey);

@@ -41,16 +41,16 @@ class SamlUtils {
 
     static void init() {
         documentBuilderFactory.setNamespaceAware(true);
-        try {
-            InitializationService.initialize();
-        } catch (InitializationException e) {
-            throw new RuntimeException("Could not initialize OpenSaml", e);
-        }
     }
 
     static byte[] decodeSamlRequest(String encodedSamlRequest) {
         return Base64.getDecoder()
             .decode(encodedSamlRequest);
+    }
+
+    static String encodeSamlResponse(String samlResponse) {
+        return Base64.getEncoder()
+            .encodeToString(samlResponse.getBytes());
     }
 
     static XMLObject toXmlObject(byte[] samlRequest)

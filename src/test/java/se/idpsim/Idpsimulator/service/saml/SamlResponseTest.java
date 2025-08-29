@@ -4,10 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 import javax.xml.transform.TransformerException;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensaml.core.xml.io.MarshallingException;
 
 class SamlResponseTest {
+
+    @BeforeEach
+    void setup() {
+        OpenSamlConfig.init();
+    }
 
     @Test
     void createSamlResponse() throws MarshallingException, TransformerException {

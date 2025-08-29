@@ -3,10 +3,12 @@ package se.idpsim.Idpsimulator.service.saml;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
+import javax.xml.transform.TransformerException;
 import lombok.Builder;
 import lombok.Getter;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.config.XMLObjectProviderRegistrySupport;
+import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.saml.common.xml.SAMLConstants;
 import org.opensaml.saml.saml2.core.NameIDType;
 import org.opensaml.saml.saml2.metadata.EntityDescriptor;
@@ -87,7 +89,7 @@ public class SamlMetadata {
             .buildObject(SingleSignOnService.DEFAULT_ELEMENT_NAME);
 
         ssoService.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
-        ssoService.setLocation("abc"); // endpoint
+        ssoService.setLocation(singleSignOnServiceUrl);
         idpDescriptor.getSingleSignOnServices()
             .add(ssoService);
 
@@ -123,5 +125,17 @@ public class SamlMetadata {
         entityDescriptor.getRoleDescriptors()
             .add(idpDescriptor);
         return entityDescriptor;
+    }
+
+    //TODO better exception handling
+    public String toString() {
+        try {
+            var doc = SamlUtils.toDocument(entityDescriptor);
+            return SamlUtils.documentToString(doc);
+        } catch (MarshallingException e) {
+            throw new RuntimeException(e);
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
