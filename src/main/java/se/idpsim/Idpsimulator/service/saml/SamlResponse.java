@@ -2,9 +2,11 @@ package se.idpsim.Idpsimulator.service.saml;
 
 import java.time.Instant;
 import java.util.List;
+import javax.xml.transform.TransformerException;
 import lombok.Builder;
 import lombok.Getter;
 import org.opensaml.core.xml.XMLObjectBuilderFactory;
+import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.Attribute;
@@ -71,6 +73,16 @@ public class SamlResponse {
         this.audience = audience;
         createdAt = Instant.now();
         buildSamlResponse();
+    }
+
+    public String toString() {
+        try {
+            return SamlUtils.samlResponseToString(this);
+        } catch (MarshallingException e) {
+            throw new RuntimeException(e); //TODO better exception
+        } catch (TransformerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void buildSamlResponse() {

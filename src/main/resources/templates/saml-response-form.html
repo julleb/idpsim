@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>SAML POST Form</title>
+  <meta charset="UTF-8">
+</head>
+<body onload="document.forms[0].submit()">
+<h2>Redirecting to SAML Identity Provider...</h2>
+
+<form th:action="${formAction}" method="post">
+  <input type="hidden" name="SAMLRequest" th:value="${samlRequest}" />
+  <input type="hidden" name="RelayState" th:value="${relayState}" />
+  <noscript>
+    <p>JavaScript is disabled. Click the button below to continue:</p>
+    <button type="submit">Continue</button>
+  </noscript>
+</form>
+
+</body>
+</html>

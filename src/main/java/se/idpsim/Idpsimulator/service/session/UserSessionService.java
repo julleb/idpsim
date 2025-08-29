@@ -33,6 +33,12 @@ public class UserSessionService {
             .setAttribute(key, value);
     }
 
+    public Optional<Object> getAttribute(String key) {
+        log.debug("Getting attribute from user session: {}", key);
+        return Optional.ofNullable(getCurrentRequest().getSession(false))
+            .map(session -> session.getAttribute(key));
+    }
+
     private HttpServletRequest getCurrentRequest() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         if (requestAttributes instanceof ServletRequestAttributes servletRequestAttributes) {
