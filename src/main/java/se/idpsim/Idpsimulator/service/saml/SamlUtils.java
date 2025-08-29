@@ -7,7 +7,6 @@ import java.util.Base64;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -21,7 +20,7 @@ import org.opensaml.core.xml.io.Marshaller;
 import org.opensaml.core.xml.io.MarshallerFactory;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.io.UnmarshallingException;
-import org.opensaml.core.xml.util.XMLObjectSupport;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -31,6 +30,10 @@ class SamlUtils {
         DocumentBuilderFactory.newInstance();
 
     static {
+        init();
+    }
+
+    static void init() {
         documentBuilderFactory.setNamespaceAware(true);
         try {
             InitializationService.initialize();
@@ -61,18 +64,25 @@ class SamlUtils {
     }
 
     static String samlResponseToString(SamlResponse samlResponse) throws MarshallingException, TransformerException {
-        MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
-        Marshaller marshaller = marshallerFactory.getMarshaller(samlResponse.getResponse());
-        marshaller.marshall(samlResponse.getResponse());
-        Element element = marshaller.marshall(samlResponse.getResponse());
-        var doc = element.getOwnerDocument();
+        var doc = toDocument(samlResponse.getResponse());
+        return documentToString(doc);
+    }
 
+    static Document toDocument(XMLObject xmlObject)
+        throws MarshallingException, TransformerException {
+        MarshallerFactory marshallerFactory = XMLObjectProviderRegistrySupport.getMarshallerFactory();
+        Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
+        marshaller.marshall(xmlObject);
+        Element element = marshaller.marshall(xmlObject);
+        return element.getOwnerDocument();
+    }
+
+    static String documentToString(Document doc) throws TransformerException {
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         Transformer transformer = transformerFactory.newTransformer();
         StringWriter stringWriter = new StringWriter();
         transformer.transform(new DOMSource(doc), new StreamResult(stringWriter));
         return stringWriter.toString();
-
     }
 
 }
