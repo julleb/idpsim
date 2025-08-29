@@ -12,7 +12,8 @@ import se.idpsim.Idpsimulator.service.saml.SamlSigningService;
 public class DummySimulator {
 
     public static final String ENTITY_ID_SUFFIX = "/dummysimulator/metadata/0" ;
-    public static final String SSO_URL_SUFFIX = "/dummysimulator/acs" ;
+    public static final String SSO_URL_SUFFIX = "/dummysimulator/req/0";
+    public static final String SAML_RESPONSE_FORM_URL = "/dummysimulator/resp/0";
     private final SamlSigningService samlSigningService;
 
     DummySimulator(SamlSigningService samlSigningService) {
