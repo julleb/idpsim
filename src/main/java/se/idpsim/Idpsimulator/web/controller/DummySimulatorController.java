@@ -46,7 +46,7 @@ public class DummySimulatorController {
     @PostMapping(value = DummySimulator.SAML_RESPONSE_FORM_URL, produces = MediaType.TEXT_HTML_VALUE)
     public String createSamlResponseForm(@ModelAttribute SimpleUser simpleUser, Model model) {
         var htmlForm = dummySimulator.getSamlResponseHtmlForm(simpleUser);
-        model.addAttribute("samlRequest", htmlForm.getSamlResponse());
+        model.addAttribute("samlResponse", htmlForm.getSamlResponse());
         model.addAttribute("formAction", htmlForm.getSubmitUrl());
         model.addAttribute("relayState", htmlForm.getRelayState());
         return "saml-response-form";

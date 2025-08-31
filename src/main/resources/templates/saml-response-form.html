@@ -8,7 +8,7 @@
 <h2>Redirecting to SAML Identity Provider...</h2>
 
 <form th:action="${formAction}" method="post">
-  <input type="hidden" name="SAMLRequest" th:value="${samlRequest}" />
+  <input type="hidden" name="SAMLResponse" th:value="${samlResponse}" />
   <input type="hidden" name="RelayState" th:value="${relayState}" />
   <noscript>
     <p>JavaScript is disabled. Click the button below to continue:</p>

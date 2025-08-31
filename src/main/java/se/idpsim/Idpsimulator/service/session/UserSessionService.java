@@ -13,17 +13,17 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class UserSessionService {
 
     public void createSession() {
-        log.info("Creating user session");
+        log.debug("Creating user session");
         getCurrentRequest().getSession(true);
     }
 
     public void invalidateSession() {
-        log.info("Invalidating user session");
+        log.debug("Invalidating user session");
         HttpServletRequest request = getCurrentRequest();
         Optional.ofNullable(request.getSession(false))
             .ifPresent(session -> {
                 session.invalidate();
-                log.info("User session invalidated");
+                log.debug("User session invalidated");
             });
     }
 
