@@ -18,9 +18,9 @@ public class ExceptionControllerHandler {
         ProblemDetail pb = switch(e) {
             case NoResourceFoundException ignored ->
                 ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
-            case IllegalArgumentException ie ->
+            case IllegalArgumentException ignored ->
                  ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
-            case BadInputServiceException be ->
+            case BadInputServiceException ignored ->
                 ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
             default ->
                 ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
