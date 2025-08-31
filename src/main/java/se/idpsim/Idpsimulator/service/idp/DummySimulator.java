@@ -43,8 +43,13 @@ public class DummySimulator {
 
         userSessionService.invalidateSession();
 
-        SamlRequest samlRequest = SamlRequest.fromString()
-            .encodedSamlRequest(encodedSamlReq).build();
+        SamlRequest samlRequest = null;
+        try {
+            samlRequest = SamlRequest.fromString()
+                .encodedSamlRequest(encodedSamlReq).build();
+        } catch (IllegalArgumentException e) {
+            throw new ServiceException("Failed to parse SAMLRequest", e);
+        }
 
         String hostUrl = HttpServletRequestUtils.getHostUrl();
         String entityId = getEntityId(hostUrl);
