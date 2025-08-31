@@ -23,7 +23,7 @@ public class ExceptionControllerHandler {
             case BadInputServiceException ignored ->
                 ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
             default ->
-                ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+                ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         };
         logError(e);
         return ResponseEntity.status(pb.getStatus()).body(pb);

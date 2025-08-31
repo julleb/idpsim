@@ -1,31 +1,64 @@
 <html>
-<label for="nameSelect">Choose a user:</label>
-<select id="nameSelect" name="userIdSelect" onchange="populateInput()">
-    <option value="">-- Select User --</option>
-    <option th:each="user : ${users}"
-            th:value="${user.userId}"
-            th:data-firstname="${user.firstName}"
-            th:data-lastname="${user.lastName}"
-            th:data-userid="${user.userId}"
-            th:text="|${user.firstName} ${user.lastName} (${user.userId})|">
-    </option>
-</select>
-<form th:action="@{${formAction}}" method="post">
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center; /* center horizontally */
+            align-items: center;    /* center vertically */
+            height: 100vh;          /* full viewport height */
+            font-family: Arial, sans-serif;
+        }
 
-    <br/><br/>
+        .form-container {
+            text-align: center;
+        }
 
-    <label for="userIdInput">userId:</label>
-    <input type="text" id="userIdInput" name="userId" />
+        select, input {
+            display: block;
+            margin: 10px auto; /* center each input */
+            padding: 5px;
+            width: 200px;
+        }
 
-    <label for="firstNameInput">First Name:</label>
-    <input type="text" id="firstNameInput" name="firstName"/>
+        button {
+            padding: 8px 16px;
+            margin-top: 15px;
+        }
 
-    <label for="lastNameInput">Last Name:</label>
-    <input type="text" id="lastNameInput" name="lastName"/>
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h1>IDPSimulator</h1>
+    <h3>Simulates a SAML2 Identity Provider</h3>
+    <label for="nameSelect">Choose a user:</label>
+    <select id="nameSelect" name="userIdSelect" onchange="populateInput()">
+        <option value="">-- Select User --</option>
+        <option th:each="user : ${users}"
+                th:value="${user.userId}"
+                th:data-firstname="${user.firstName}"
+                th:data-lastname="${user.lastName}"
+                th:data-userid="${user.userId}"
+                th:text="|${user.firstName} ${user.lastName} (${user.userId})|">
+        </option>
+    </select>
+    <form th:action="@{${formAction}}" method="post">
+        <label for="userIdInput">userId:</label>
+        <input type="text" id="userIdInput" name="userId" />
 
-    <br/><br/>
-    <button type="submit">Submit</button>
-</form>
+        <label for="firstNameInput">First Name:</label>
+        <input type="text" id="firstNameInput" name="firstName"/>
+
+        <label for="lastNameInput">Last Name:</label>
+        <input type="text" id="lastNameInput" name="lastName"/>
+
+        <button type="submit">Submit</button>
+    </form>
+</div>
 
 <script>
     function populateInput() {
@@ -37,4 +70,5 @@
         document.getElementById('userIdInput').value = selectedOption.dataset.userid || '';
     }
 </script>
+</body>
 </html>

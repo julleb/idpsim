@@ -4,7 +4,6 @@ import java.util.Base64;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import se.idpsim.Idpsimulator.service.exception.ServiceException;
