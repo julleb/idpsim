@@ -2,7 +2,9 @@ package se.idpsim.Idpsimulator.service.idp;
 
 import java.util.Base64;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import se.idpsim.Idpsimulator.service.idp.model.SamlResponseHtmlForm;
@@ -12,24 +14,39 @@ import se.idpsim.Idpsimulator.service.saml.SamlMetadata;
 import se.idpsim.Idpsimulator.service.saml.SamlRequest;
 import se.idpsim.Idpsimulator.service.saml.SamlResponse;
 import se.idpsim.Idpsimulator.service.saml.SamlSigningService;
+import se.idpsim.Idpsimulator.service.session.UserSessionService;
+import se.idpsim.Idpsimulator.utils.HttpServletRequestUtils;
 import se.idpsim.Idpsimulator.utils.ObjectUtils;
+import se.idpsim.Idpsimulator.web.controller.Constants;
 
 @Service
 @Slf4j
+@AllArgsConstructor
 public class DummySimulator {
 
     public static final String ENTITY_ID_SUFFIX = "/dummysimulator/metadata/0" ;
     public static final String SSO_URL_SUFFIX = "/dummysimulator/req/0";
     public static final String SAML_RESPONSE_FORM_URL = "/dummysimulator/resp/0";
     private final SamlSigningService samlSigningService;
+    private final UserSessionService userSessionService;
 
-    DummySimulator(SamlSigningService samlSigningService) {
-        this.samlSigningService = samlSigningService;
-    }
 
-    public SamlResponseHtmlForm getSamlResponseHtmlForm(SamlRequest samlRequest, String relayState, SimpleUser simpleUser, String hostUrl) {
-        ObjectUtils.requireNonNull(samlRequest, "samlRequest cannot be null");
+    public SamlResponseHtmlForm getSamlResponseHtmlForm(SimpleUser simpleUser) {
         ObjectUtils.requireNonNull(simpleUser, "simpleUser cannot be null");
+
+        String encodedSamlReq = (String) userSessionService.getAttribute(Constants.SAML_REQUEST_PARAM)
+            .orElseThrow(() -> new IllegalStateException(
+                "No SAMLRequest found in user session, cannot proceed"));
+
+        String relayState = (String) userSessionService.getAttribute(Constants.RELAY_STATE_PARAM)
+            .orElse("");
+
+        userSessionService.invalidateSession();
+
+        SamlRequest samlRequest = SamlRequest.fromString()
+            .encodedSamlRequest(encodedSamlReq).build();
+
+        String hostUrl = HttpServletRequestUtils.getHostUrl();
 
         String entityId = getEntityId(hostUrl);
         List<SamlAssertion> assertions = createAssertions(simpleUser);
@@ -53,6 +70,12 @@ public class DummySimulator {
             .samlResponse(encodedSamlResponse)
             .submitUrl(samlRequest.getAssertionConsumerServiceUrl())
             .build();
+    }
+
+    public void handleSamlRequest(String samlRequest, String relayState) {
+        userSessionService.createSession();
+        userSessionService.addAttribute(Constants.SAML_REQUEST_PARAM, samlRequest);
+        userSessionService.addAttribute(Constants.RELAY_STATE_PARAM, relayState);
     }
 
     private List<SamlAssertion> createAssertions(SimpleUser simpleUser) {
