@@ -12,6 +12,7 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.SignatureSupport;
 import org.springframework.stereotype.Service;
+import se.idpsim.Idpsimulator.service.exception.ServiceException;
 import se.idpsim.Idpsimulator.utils.KeystoreUtils;
 
 @Service
@@ -45,13 +46,8 @@ public class SamlSigningService {
         signingParameters.setSignatureCanonicalizationAlgorithm(canonicalization);
         try {
             SignatureSupport.signObject(samlResponse.getResponse(), signingParameters);
-        } catch (SecurityException e) {
-            //TODO throw better exceptions
-            throw new RuntimeException(e);
-        } catch (MarshallingException e) {
-            throw new RuntimeException(e);
-        } catch (SignatureException e) {
-            throw new RuntimeException(e);
+        } catch (SecurityException | MarshallingException | SignatureException e) {
+            throw new ServiceException("Failed to sign SAML Response", e);
         }
     }
 

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
+import se.idpsim.Idpsimulator.service.exception.ServiceException;
 import se.idpsim.Idpsimulator.service.idp.model.SamlResponseHtmlForm;
 import se.idpsim.Idpsimulator.service.idp.model.SimpleUser;
 import se.idpsim.Idpsimulator.service.saml.SamlAssertion;
@@ -35,7 +36,7 @@ public class DummySimulator {
         ObjectUtils.requireNonNull(simpleUser, "simpleUser cannot be null");
 
         String encodedSamlReq = (String) userSessionService.getAttribute(Constants.SAML_REQUEST_PARAM)
-            .orElseThrow(() -> new IllegalStateException(
+            .orElseThrow(() -> new ServiceException(
                 "No SAMLRequest found in user session, cannot proceed"));
 
         String relayState = (String) userSessionService.getAttribute(Constants.RELAY_STATE_PARAM)
@@ -47,7 +48,6 @@ public class DummySimulator {
             .encodedSamlRequest(encodedSamlReq).build();
 
         String hostUrl = HttpServletRequestUtils.getHostUrl();
-
         String entityId = getEntityId(hostUrl);
         List<SamlAssertion> assertions = createAssertions(simpleUser);
         SamlResponse samlResponse = SamlResponse.builder()
@@ -107,9 +107,7 @@ public class DummySimulator {
     }
 
     public String getSamlMetadata(String hostUrl) {
-
         String entityId = getEntityId(hostUrl);
-
         SamlMetadata samlMetadata = SamlMetadata.builder()
             .entityId(entityId)
             .singleSignOnServiceUrl(hostUrl + SSO_URL_SUFFIX)

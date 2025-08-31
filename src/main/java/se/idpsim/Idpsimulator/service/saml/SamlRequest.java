@@ -24,14 +24,16 @@ public class SamlRequest {
     public SamlRequest(String encodedSamlRequest) {
         ObjectUtils.requireNonEmpty(encodedSamlRequest, "encodedSamlRequest cannot be empty");
 
-        byte [] decodeSamlRequest = SamlUtils.decodeSamlRequest(encodedSamlRequest);
+        byte[] decodeSamlRequest = SamlUtils.decodeSamlRequest(encodedSamlRequest);
 
         try {
             AuthnRequest authnRequest = (AuthnRequest) SamlUtils.toXmlObject(decodeSamlRequest);
-            issuer = authnRequest.getIssuer().getValue();
+            issuer = authnRequest.getIssuer()
+                .getValue();
             assertionConsumerServiceUrl = authnRequest.getAssertionConsumerServiceURL();
             id = authnRequest.getID();
-        } catch (ParserConfigurationException|IOException|SAXException|UnmarshallingException e) {
+        } catch (ParserConfigurationException | IOException | SAXException |
+            UnmarshallingException e) {
             throw new IllegalArgumentException("Could not parse SAML request", e);
         }
     }
