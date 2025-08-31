@@ -1,5 +1,6 @@
 package se.idpsim.Idpsimulator.web.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ public class DummySimulatorController {
 
     private final DummySimulator dummySimulator;
 
+    @Operation(summary = "Get SAML2 metadata for the Dummy IdP simulator")
     @GetMapping(value = DummySimulator.ENTITY_ID_SUFFIX, produces = MediaType.TEXT_XML_VALUE)
     public ResponseEntity<String> getMetadata() {
         String hostUrl = HttpServletRequestUtils.getHostUrl();
@@ -30,6 +32,7 @@ public class DummySimulatorController {
             .body(dummySimulator.getSamlMetadata(hostUrl));
     }
 
+    @Operation(summary = "Handle SAML authentication request and present user selection form")
     @RequestMapping(value = DummySimulator.SSO_URL_SUFFIX, produces = MediaType.TEXT_HTML_VALUE, method = {
         RequestMethod.GET, RequestMethod.POST })
     public String handleSamlRequestForm(Model model,
@@ -43,6 +46,7 @@ public class DummySimulatorController {
         return "dummy-simulator";
     }
 
+    @Operation(summary = "Create SAML response and present auto-submitting HTML form to the Service Provider")
     @PostMapping(value = DummySimulator.SAML_RESPONSE_FORM_URL, produces = MediaType.TEXT_HTML_VALUE)
     public String createSamlResponseForm(@ModelAttribute SimpleUser simpleUser, Model model) {
         var htmlForm = dummySimulator.getSamlResponseHtmlForm(simpleUser);
