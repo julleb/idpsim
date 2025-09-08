@@ -2,6 +2,7 @@ package se.idpsim.Idpsimulator.service.saml;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import javax.xml.transform.TransformerException;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,6 +46,9 @@ public class SamlResponse {
     private Instant createdAt;
 
     @Getter
+    private String statusCode;
+
+    @Getter
     private String audience; //The issuer of the SamlRequest
 
     Response getResponse() {
@@ -53,7 +57,7 @@ public class SamlResponse {
 
     @Builder
     public SamlResponse(String issuer, String destination, String inResponseTo,
-        List<SamlAssertion> assertions, String nameId, String audience) {
+        List<SamlAssertion> assertions, String nameId, String audience, String statusCode) {
 
         ObjectUtils.requireNonEmpty(issuer, "issuer cannot be empty");
         ObjectUtils.requireNonEmpty(destination, "destination cannot be empty");
@@ -62,6 +66,7 @@ public class SamlResponse {
         ObjectUtils.requireNonEmpty(nameId, "nameId cannot be empty");
         ObjectUtils.requireNonEmpty(audience, "audience cannot be empty");
 
+        this.statusCode = Optional.ofNullable(statusCode).orElse(StatusCode.SUCCESS);
 
         this.issuer = issuer;
         this.destination = destination;
@@ -204,7 +209,7 @@ public class SamlResponse {
 
     private Status createStatus() {
         StatusCode statusCode = SamlUtils.createObject(StatusCode.class, StatusCode.DEFAULT_ELEMENT_NAME);
-        statusCode.setValue(StatusCode.SUCCESS);
+        statusCode.setValue(this.statusCode);
         Status status = SamlUtils.createObject(Status.class, Status.DEFAULT_ELEMENT_NAME);
         status.setStatusCode(statusCode);
         return status;

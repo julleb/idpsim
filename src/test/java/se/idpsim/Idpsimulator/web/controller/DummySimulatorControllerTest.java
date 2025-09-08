@@ -63,6 +63,7 @@ class DummySimulatorControllerTest {
                 BodyInserters.fromFormData("userId", "id123")
                     .with("firstName", "Alice")
                     .with("lastName", "Alisson")
+                    .with("userAction", "SUBMIT")
             )
             .exchange()
             .expectStatus()

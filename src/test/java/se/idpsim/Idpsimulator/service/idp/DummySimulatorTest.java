@@ -11,6 +11,7 @@ import se.idpsim.Idpsimulator.TestData;
 import se.idpsim.Idpsimulator.service.exception.ServiceException;
 import se.idpsim.Idpsimulator.service.idp.model.SamlResponseHtmlForm;
 import se.idpsim.Idpsimulator.service.idp.model.SimpleUser;
+import se.idpsim.Idpsimulator.service.idp.model.UserAction;
 
 @SpringBootTest
 class DummySimulatorTest {
@@ -31,7 +32,7 @@ class DummySimulatorTest {
             .firstName("Lola")
             .lastName("Kanin")
             .build();
-        assertThrows(ServiceException.class, () -> dummySimulator.getSamlResponseHtmlForm(simpleUser));
+        assertThrows(ServiceException.class, () -> dummySimulator.getSamlResponseHtmlForm(simpleUser, UserAction.SUBMIT));
     }
 
     @Test
@@ -42,7 +43,7 @@ class DummySimulatorTest {
             .firstName("Lola")
             .lastName("Kanin")
             .build();
-        assertThrows(ServiceException.class, () -> dummySimulator.getSamlResponseHtmlForm(simpleUser));
+        assertThrows(ServiceException.class, () -> dummySimulator.getSamlResponseHtmlForm(simpleUser, UserAction.SUBMIT));
     }
 
     @Test
@@ -53,7 +54,7 @@ class DummySimulatorTest {
                 .userId("abc123")
                 .firstName("Lola")
                 .lastName("Kanin")
-            .build());
+            .build(), UserAction.SUBMIT);
 
         assertEquals(relayState, htmlForm.getRelayState());
         assertNotNull(htmlForm.getSamlResponse());

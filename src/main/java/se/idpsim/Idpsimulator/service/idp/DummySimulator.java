@@ -4,11 +4,13 @@ import java.util.Base64;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.opensaml.saml.saml2.core.StatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 import se.idpsim.Idpsimulator.service.exception.ServiceException;
 import se.idpsim.Idpsimulator.service.idp.model.SamlResponseHtmlForm;
 import se.idpsim.Idpsimulator.service.idp.model.SimpleUser;
+import se.idpsim.Idpsimulator.service.idp.model.UserAction;
 import se.idpsim.Idpsimulator.service.saml.SamlAssertion;
 import se.idpsim.Idpsimulator.service.saml.SamlMetadata;
 import se.idpsim.Idpsimulator.service.saml.SamlRequest;
@@ -31,8 +33,9 @@ public class DummySimulator {
     private final UserSessionService userSessionService;
 
 
-    public SamlResponseHtmlForm getSamlResponseHtmlForm(SimpleUser simpleUser) {
+    public SamlResponseHtmlForm getSamlResponseHtmlForm(SimpleUser simpleUser, UserAction userAction) {
         ObjectUtils.requireNonNull(simpleUser, "simpleUser cannot be null");
+        ObjectUtils.requireNonNull(userAction, "userAction cannot be null");
 
         String encodedSamlReq = (String) userSessionService.getAttribute(Constants.SAML_REQUEST_PARAM)
             .orElseThrow(() -> new ServiceException(
@@ -51,6 +54,11 @@ public class DummySimulator {
             throw new ServiceException("Failed to parse SAMLRequest", e);
         }
 
+        String statusCode = StatusCode.SUCCESS;
+        if(userAction == UserAction.CANCEL) {
+            statusCode = StatusCode.AUTHN_FAILED;
+        }
+
         String hostUrl = HttpServletRequestUtils.getHostUrl();
         String entityId = getEntityId(hostUrl);
         List<SamlAssertion> assertions = createAssertions(simpleUser);
@@ -61,6 +69,7 @@ public class DummySimulator {
             .audience(samlRequest.getIssuer())
             .nameId(simpleUser.getUserId())
             .assertions(assertions)
+            .statusCode(statusCode)
             .build();
 
         samlSigningService.signSamlResponse(samlResponse);

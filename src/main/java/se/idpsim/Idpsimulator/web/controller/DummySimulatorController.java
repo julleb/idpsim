@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import se.idpsim.Idpsimulator.service.idp.DummySimulator;
 import se.idpsim.Idpsimulator.service.idp.model.SimpleUser;
+import se.idpsim.Idpsimulator.service.idp.model.UserAction;
 import se.idpsim.Idpsimulator.utils.HttpServletRequestUtils;
 
 @Controller
@@ -48,8 +49,10 @@ public class DummySimulatorController {
 
     @Operation(summary = "Create SAML response and present auto-submitting HTML form to the Service Provider")
     @PostMapping(value = DummySimulator.SAML_RESPONSE_FORM_URL, produces = MediaType.TEXT_HTML_VALUE)
-    public String createSamlResponseForm(@ModelAttribute SimpleUser simpleUser, Model model) {
-        var htmlForm = dummySimulator.getSamlResponseHtmlForm(simpleUser);
+    public String createSamlResponseForm(@ModelAttribute SimpleUser simpleUser, @ModelAttribute
+        UserAction userAction, Model model) {
+        log.debug("User selected: {}, action: {}", simpleUser, userAction);
+        var htmlForm = dummySimulator.getSamlResponseHtmlForm(simpleUser, userAction);
         model.addAttribute("samlResponse", htmlForm.getSamlResponse());
         model.addAttribute("formAction", htmlForm.getSubmitUrl());
         model.addAttribute("relayState", htmlForm.getRelayState());
