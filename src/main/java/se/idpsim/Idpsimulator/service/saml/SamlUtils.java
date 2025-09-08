@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Base64;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -99,14 +100,19 @@ class SamlUtils {
 
     static Signature createSignature(BasicX509Credential credential,
         String signatureAlgorithm, String canonicalizationMethod) {
-        Signature signature = (Signature) XMLObjectProviderRegistrySupport.getBuilderFactory()
-            .getBuilder(Signature.DEFAULT_ELEMENT_NAME)
-            .buildObject(Signature.DEFAULT_ELEMENT_NAME);
+        Signature signature = createObject(Signature.class, Signature.DEFAULT_ELEMENT_NAME);
 
         signature.setSigningCredential(credential);
         signature.setSignatureAlgorithm(signatureAlgorithm);
         signature.setCanonicalizationAlgorithm(canonicalizationMethod);
         return signature;
+    }
+
+    static <T> T createObject(Class<T> clazz, QName qname) {
+        var builder = XMLObjectProviderRegistrySupport.getBuilderFactory().getBuilder(qname);
+        if(builder == null) throw new IllegalArgumentException("No builder for " + qname);
+        XMLObject obj = builder.buildObject(qname);
+        return clazz.cast(obj);
     }
 
 }

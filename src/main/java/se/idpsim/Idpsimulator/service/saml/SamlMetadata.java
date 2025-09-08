@@ -67,26 +67,20 @@ public class SamlMetadata {
     }
 
     private EntityDescriptor createSamlMetadata() throws CertificateEncodingException {
-        XMLObjectBuilderFactory builderFactory =
-            XMLObjectProviderRegistrySupport.getBuilderFactory();
-
-        EntityDescriptor entityDescriptor =
-            (EntityDescriptor) builderFactory.getBuilder(EntityDescriptor.DEFAULT_ELEMENT_NAME)
-                .buildObject(EntityDescriptor.DEFAULT_ELEMENT_NAME);
+        EntityDescriptor entityDescriptor = SamlUtils.createObject(
+            EntityDescriptor.class, EntityDescriptor.DEFAULT_ELEMENT_NAME);
 
         entityDescriptor.setEntityID(entityId);
 
-        IDPSSODescriptor idpDescriptor =
-            (IDPSSODescriptor) builderFactory.getBuilder(IDPSSODescriptor.DEFAULT_ELEMENT_NAME)
-                .buildObject(IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
+        IDPSSODescriptor idpDescriptor = SamlUtils.createObject(
+            IDPSSODescriptor.class, IDPSSODescriptor.DEFAULT_ELEMENT_NAME);
 
         idpDescriptor.setWantAuthnRequestsSigned(false);
         idpDescriptor.addSupportedProtocol("urn:oasis:names:tc:SAML:2.0:protocol");
 
         // Add SingleSignOnService
-        SingleSignOnService ssoService = (SingleSignOnService) builderFactory.getBuilder(
-                SingleSignOnService.DEFAULT_ELEMENT_NAME)
-            .buildObject(SingleSignOnService.DEFAULT_ELEMENT_NAME);
+        SingleSignOnService ssoService = SamlUtils.createObject(
+            SingleSignOnService.class, SingleSignOnService.DEFAULT_ELEMENT_NAME);
 
         ssoService.setBinding(SAMLConstants.SAML2_POST_BINDING_URI);
         ssoService.setLocation(singleSignOnServiceUrl);
@@ -94,25 +88,21 @@ public class SamlMetadata {
             .add(ssoService);
 
         // Add NameIDFormat
-        var nameIdFormat =
-            (NameIDFormat) builderFactory.getBuilder(NameIDFormat.DEFAULT_ELEMENT_NAME)
-                .buildObject(NameIDFormat.DEFAULT_ELEMENT_NAME);
+        var nameIdFormat = SamlUtils.createObject(
+            NameIDFormat.class, NameIDFormat.DEFAULT_ELEMENT_NAME);
         nameIdFormat.setURI(NameIDType.TRANSIENT);
         idpDescriptor.getNameIDFormats()
             .add(nameIdFormat);
 
         //set keydescriptor
-        KeyDescriptor keyDescriptor =
-            (KeyDescriptor) builderFactory.getBuilder(KeyDescriptor.DEFAULT_ELEMENT_NAME)
-                .buildObject(KeyDescriptor.DEFAULT_ELEMENT_NAME);
+        KeyDescriptor keyDescriptor = SamlUtils.createObject(
+            KeyDescriptor.class, KeyDescriptor.DEFAULT_ELEMENT_NAME);
         keyDescriptor.setUse(UsageType.SIGNING);
-        KeyInfo keyInfo = (KeyInfo) builderFactory.getBuilder(KeyInfo.DEFAULT_ELEMENT_NAME)
-            .buildObject(KeyInfo.DEFAULT_ELEMENT_NAME);
-        X509Data x509Data = (X509Data) builderFactory.getBuilder(X509Data.DEFAULT_ELEMENT_NAME)
-            .buildObject(X509Data.DEFAULT_ELEMENT_NAME);
-        org.opensaml.xmlsec.signature.X509Certificate x509CertElement = (org.opensaml.xmlsec.signature.X509Certificate) builderFactory
-            .getBuilder(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME)
-            .buildObject(org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
+        KeyInfo keyInfo = SamlUtils.createObject(KeyInfo.class, KeyInfo.DEFAULT_ELEMENT_NAME);
+        X509Data x509Data = SamlUtils.createObject(X509Data.class, X509Data.DEFAULT_ELEMENT_NAME);
+        org.opensaml.xmlsec.signature.X509Certificate x509CertElement = SamlUtils.createObject(
+            org.opensaml.xmlsec.signature.X509Certificate.class,
+            org.opensaml.xmlsec.signature.X509Certificate.DEFAULT_ELEMENT_NAME);
 
         String encodedCert = Base64.getEncoder().encodeToString(signingCertificate.getEncoded());
         x509CertElement.setValue(encodedCert);

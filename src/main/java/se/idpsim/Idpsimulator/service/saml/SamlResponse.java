@@ -5,7 +5,6 @@ import java.util.List;
 import javax.xml.transform.TransformerException;
 import lombok.Builder;
 import lombok.Getter;
-import org.opensaml.core.xml.XMLObjectBuilderFactory;
 import org.opensaml.core.xml.io.MarshallingException;
 import org.opensaml.core.xml.schema.XSString;
 import org.opensaml.saml.saml2.core.Assertion;
@@ -22,7 +21,6 @@ import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.saml.saml2.core.Subject;
 import org.opensaml.saml.saml2.core.SubjectConfirmation;
 import org.opensaml.saml.saml2.core.SubjectConfirmationData;
-import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
 import se.idpsim.Idpsimulator.utils.ObjectUtils;
 
 
@@ -86,26 +84,23 @@ public class SamlResponse {
     }
 
     private void buildSamlResponse() {
-        var builderFactory = SamlUtils.getXmlObjectBuilderFactory();
-
         //we create Issuer two times, otherwise OpenSaml complains
-        Issuer issuer = createIssuer(builderFactory);
-        Issuer issuer1 = createIssuer(builderFactory);
+        Issuer issuer = createIssuer();
+        Issuer issuer1 = createIssuer();
 
-        Subject subject = createSubject(builderFactory);
-        Status status = createStatus(builderFactory);
-        Conditions conditions = createConditions(builderFactory);
-        AttributeStatement attributeStatement = createAttributeStatement(builderFactory);
+        Subject subject = createSubject();
+        Status status = createStatus();
+        Conditions conditions = createConditions();
+        AttributeStatement attributeStatement = createAttributeStatement();
 
-        Assertion assertion = createAssertion(builderFactory);
+        Assertion assertion = createAssertion();
         assertion.setIssuer(issuer1);
         assertion.setSubject(subject);
         assertion.setConditions(conditions);
         assertion.getAttributeStatements()
             .add(attributeStatement);
 
-        response = (Response) builderFactory.getBuilder(Response.DEFAULT_ELEMENT_NAME)
-            .buildObject(Response.DEFAULT_ELEMENT_NAME);
+        response = SamlUtils.createObject(Response.class, Response.DEFAULT_ELEMENT_NAME);
         response.setIssuer(issuer);
         response.setInResponseTo(this.inResponseTo);
         response.setID(SamlUtils.generateSecureRandomId());
@@ -119,37 +114,33 @@ public class SamlResponse {
         return createdAt.plusSeconds(300);
     }
 
-    private Conditions createConditions(XMLObjectBuilderFactory builderFactory) {
-        Conditions conditions = (Conditions) builderFactory.getBuilder(Conditions.DEFAULT_ELEMENT_NAME)
-            .buildObject(Conditions.DEFAULT_ELEMENT_NAME);
+    private Conditions createConditions() {
+        Conditions conditions = SamlUtils.createObject(Conditions.class,
+            Conditions.DEFAULT_ELEMENT_NAME);
         conditions.setNotBefore(createdAt);
         conditions.setNotOnOrAfter(getNotOnOrAfter());
 
         // Add AudienceRestriction
-        var audienceRestriction = (AudienceRestriction) builderFactory.getBuilder(AudienceRestriction.DEFAULT_ELEMENT_NAME)
-            .buildObject(AudienceRestriction.DEFAULT_ELEMENT_NAME);
+        var audienceRestriction = (SamlUtils.createObject(AudienceRestriction.class,
+            AudienceRestriction.DEFAULT_ELEMENT_NAME));
 
-        var audience = (Audience) builderFactory.getBuilder(Audience.DEFAULT_ELEMENT_NAME).buildObject(Audience.DEFAULT_ELEMENT_NAME);
+        var audience = (SamlUtils.createObject(Audience.class, Audience.DEFAULT_ELEMENT_NAME));
         audience.setURI(this.audience);
         audienceRestriction.getAudiences().add(audience);
         conditions.getAudienceRestrictions().add(audienceRestriction);
         return conditions;
     }
 
-    private AttributeStatement createAttributeStatement(XMLObjectBuilderFactory builderFactory) {
-        var attributeStatement =
-            (AttributeStatement) builderFactory.getBuilder(AttributeStatement.DEFAULT_ELEMENT_NAME)
-                .buildObject(AttributeStatement.DEFAULT_ELEMENT_NAME);
+    private AttributeStatement createAttributeStatement() {
+        var attributeStatement = SamlUtils.createObject(AttributeStatement.class,
+            AttributeStatement.DEFAULT_ELEMENT_NAME);
         for (SamlAssertion samlAssertion : assertions) {
-            Attribute attribute =
-                (Attribute) builderFactory.getBuilder(Attribute.DEFAULT_ELEMENT_NAME)
-                    .buildObject(Attribute.DEFAULT_ELEMENT_NAME);
-
+            Attribute attribute = SamlUtils.createObject(Attribute.class,
+                Attribute.DEFAULT_ELEMENT_NAME);
             attribute.setName(samlAssertion.getName());
             attribute.setFriendlyName(samlAssertion.getFriendlyName());
 
-            var attrVal = (XSString) builderFactory.getBuilder(XSString.TYPE_NAME)
-                .buildObject(XSString.TYPE_NAME);
+            var attrVal = SamlUtils.createObject(XSString.class, XSString.TYPE_NAME);
             attrVal.setValue(samlAssertion.getValue());
             attribute.getAttributeValues()
                 .add(attrVal);
@@ -159,36 +150,29 @@ public class SamlResponse {
         return attributeStatement;
     }
 
-    private Assertion createAssertion(XMLObjectBuilderFactory builderFactory) {
-        Assertion assertion = (Assertion) builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME)
-            .buildObject(Assertion.DEFAULT_ELEMENT_NAME);
+    private Assertion createAssertion() {
+        Assertion assertion = SamlUtils.createObject(Assertion.class, Assertion.DEFAULT_ELEMENT_NAME);
         assertion.setID("_" + SamlUtils.generateSecureRandomId());
         assertion.setIssueInstant(createdAt);
         return assertion;
     }
 
-    private Issuer createIssuer(XMLObjectBuilderFactory builderFactory) {
-        var issuerBuilder = (IssuerBuilder) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
-        var issuer = issuerBuilder.buildObject();
+    private Issuer createIssuer() {
+        var issuer = SamlUtils.createObject(Issuer.class, Issuer.DEFAULT_ELEMENT_NAME);
         issuer.setValue(this.issuer);
         return issuer;
     }
 
-    private NameID createNameId(XMLObjectBuilderFactory builderFactory) {
-        var nameIdObject = (NameID) builderFactory.getBuilder(NameID.DEFAULT_ELEMENT_NAME)
-            .buildObject(NameID.DEFAULT_ELEMENT_NAME);
-
+    private NameID createNameId() {
+        var nameIdObject = SamlUtils.createObject(NameID.class, NameID.DEFAULT_ELEMENT_NAME);
         nameIdObject.setFormat(NameID.UNSPECIFIED);
         nameIdObject.setValue(this.nameId);
         return nameIdObject;
     }
 
-    private SubjectConfirmationData createSubjectConfirmationData(
-        XMLObjectBuilderFactory builderFactory) {
-        SubjectConfirmationData confirmationData =
-            (SubjectConfirmationData) builderFactory.getBuilder(
-                    SubjectConfirmationData.DEFAULT_ELEMENT_NAME)
-                .buildObject(SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
+    private SubjectConfirmationData createSubjectConfirmationData() {
+        SubjectConfirmationData confirmationData = SamlUtils.createObject(SubjectConfirmationData.class,
+            SubjectConfirmationData.DEFAULT_ELEMENT_NAME);
         confirmationData.setRecipient(destination);
         confirmationData.setInResponseTo(inResponseTo);
         confirmationData.setNotOnOrAfter(getNotOnOrAfter());
@@ -196,38 +180,32 @@ public class SamlResponse {
         return confirmationData;
     }
 
-    private SubjectConfirmation createSubjectConfirmation(XMLObjectBuilderFactory builderFactory) {
-        SubjectConfirmation subjectConfirmation = (SubjectConfirmation) builderFactory.getBuilder(
-                SubjectConfirmation.DEFAULT_ELEMENT_NAME)
-            .buildObject(SubjectConfirmation.DEFAULT_ELEMENT_NAME);
+    private SubjectConfirmation createSubjectConfirmation() {
+        SubjectConfirmation subjectConfirmation = SamlUtils.createObject(SubjectConfirmation.class,
+            SubjectConfirmation.DEFAULT_ELEMENT_NAME);
         subjectConfirmation.setMethod(SubjectConfirmation.METHOD_BEARER);
-        SubjectConfirmationData confirmationData = createSubjectConfirmationData(builderFactory);
+        SubjectConfirmationData confirmationData = createSubjectConfirmationData();
         subjectConfirmation.setSubjectConfirmationData(confirmationData);
         return subjectConfirmation;
     }
 
-    private Subject createSubject(XMLObjectBuilderFactory builderFactory) {
-        Subject subject = (Subject) builderFactory.getBuilder(Subject.DEFAULT_ELEMENT_NAME)
-            .buildObject(Subject.DEFAULT_ELEMENT_NAME);
-        NameID nameID = createNameId(builderFactory);
+    private Subject createSubject() {
+        Subject subject = SamlUtils.createObject(Subject.class, Subject.DEFAULT_ELEMENT_NAME);
+        NameID nameID = createNameId();
         subject.setNameID(nameID);
-        SubjectConfirmation subjectConfirmation = createSubjectConfirmation(builderFactory);
+        SubjectConfirmation subjectConfirmation = createSubjectConfirmation();
         subject.getSubjectConfirmations()
             .add(subjectConfirmation);
 
-        nameID = createNameId(builderFactory);
+        nameID = createNameId();
         subject.setNameID(nameID);
         return subject;
     }
 
-    private Status createStatus(XMLObjectBuilderFactory builderFactory) {
-        StatusCode statusCode =
-            (StatusCode) builderFactory.getBuilder(StatusCode.DEFAULT_ELEMENT_NAME)
-                .buildObject(StatusCode.DEFAULT_ELEMENT_NAME);
+    private Status createStatus() {
+        StatusCode statusCode = SamlUtils.createObject(StatusCode.class, StatusCode.DEFAULT_ELEMENT_NAME);
         statusCode.setValue(StatusCode.SUCCESS);
-
-        Status status = (Status) builderFactory.getBuilder(Status.DEFAULT_ELEMENT_NAME)
-            .buildObject(Status.DEFAULT_ELEMENT_NAME);
+        Status status = SamlUtils.createObject(Status.class, Status.DEFAULT_ELEMENT_NAME);
         status.setStatusCode(statusCode);
         return status;
     }
